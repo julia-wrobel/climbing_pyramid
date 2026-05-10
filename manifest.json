@@ -3667,9 +3667,6 @@
     }
   },
   "files": {
-    "app.R": {
-      "checksum": "d5444895311ca09067ffb509d559f35f"
-    },
     "make_pyramid.R": {
       "checksum": "cb16dcc60cb0ed2736ab0ec605ca34f5"
     },
@@ -3678,6 +3675,9 @@
     },
     "ticks.csv": {
       "checksum": "d140c52aa34ca3d37cee827723b91539"
+    },
+    "ui.R": {
+      "checksum": "9f9c643bc47fb6585e8b31c1ae756448"
     }
   },
   "users": null
