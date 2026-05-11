@@ -7,8 +7,11 @@ source("make_pyramid.R")
 function(input, output, session) {
 
   ticks <- reactive({
-    req(input$file)
-    process_ticks(input$file$datapath)
+    if (is.null(input$file)) {
+      process_ticks("ticks.csv")
+    } else {
+      process_ticks(input$file$datapath)
+    }
   })
 
   output$year_filter <- renderUI({
