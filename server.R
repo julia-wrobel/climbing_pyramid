@@ -8,7 +8,10 @@ function(input, output, session) {
 
   ticks <- reactive({
     if (is.null(input$file)) {
-      process_ticks("ticks.csv")
+      tryCatch(
+        process_ticks("https://www.mountainproject.com/user/112174408/julia-wrobel/tick-export"),
+        error = function(e) process_ticks("ticks.csv")
+      )
     } else {
       process_ticks(input$file$datapath)
     }
