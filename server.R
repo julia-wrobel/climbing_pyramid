@@ -17,6 +17,16 @@ function(input, output, session) {
     }
   })
 
+  output$climber_name <- renderText({
+    if (is.null(input$file)) {
+      mp_url <- "https://www.mountainproject.com/user/112174408/julia-wrobel/tick-export"
+      raw <- strsplit(mp_url, "/")[[1]][6]
+      gsub("-", " ", raw) %>% str_to_title()
+    } else {
+      ""
+    }
+  })
+
   output$year_filter <- renderUI({
     years <- sort(unique(ticks()$year), decreasing = TRUE)
     checkboxGroupInput(
@@ -74,6 +84,10 @@ axis.text.x     = element_blank(),
   output$pitch_count <- renderText({
     total <- sum(filtered_ticks()$pitches, na.rm = TRUE)
     paste("Total pitches climbed:", total)
+  })
+
+  output$longitudinalPlot <- renderPlotly({
+    NULL
   })
 
 }
