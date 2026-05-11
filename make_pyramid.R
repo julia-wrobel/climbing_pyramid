@@ -21,6 +21,17 @@ grade_map <- c(
   "5.14a" = "5.14a"
 )
 
+lead_style_colors <- c(
+  "Onsight"   = "#0072B2",
+  "Flash"     = "#56B4E9",
+  "Redpoint"  = "#CC0000",
+  "Pinkpoint" = "#CC79A7",
+  "Top Rope"  = "#009E73",
+  "Lead"      = "#E69F00",
+  "Follow"    = "#F0E442",
+  "Solo"      = "#000000"
+)
+
 grade_levels <- c(
   "5.0", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6",
   "5.7", "5.8", "5.9",

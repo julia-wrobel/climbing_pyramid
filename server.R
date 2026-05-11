@@ -59,13 +59,13 @@ function(input, output, session) {
                fill = lead_style,
                text = paste0("Lead Style: ", lead_style, "<br>Count: ", n))) +
       geom_rect() +
+      scale_fill_manual(values = lead_style_colors, name = NULL) +
       scale_y_continuous(breaks = seq_along(grade_levels), labels = grade_levels) +
       facet_wrap(~route_type) +
       labs(x = NULL, y = "Grade") +
       theme_minimal() +
       theme(strip.text      = element_text(size = 16, face = "bold"),
-            legend.position = "none",
-            axis.text.x     = element_blank(),
+axis.text.x     = element_blank(),
             axis.ticks.x    = element_blank())
 
     ggplotly(p, tooltip = "text")
