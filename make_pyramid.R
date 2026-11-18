@@ -98,3 +98,30 @@ process_ticks <- function(filepath) {
       )
     )
 }
+
+# ggplotly draws every rectangle of one colour in a facet as a single shape, so
+# hovering or clicking can't tell the chunks apart (and the hover text shows the
+# first chunk's count for all of them). Split each rectangle into its own trace.
+split_rect_traces <- function(plt, summary) {
+  plt   <- plotly_build(plt)
+  hover <- setNames(paste0("Lead Style: ", summary$lead_style, "<br>Count: ", summary$n,
+                           "<br><i>Click to see routes</i>"), summary$key)
+
+  plt$x$data <- unlist(lapply(plt$x$data, function(tr) {
+    if (is.null(tr$key) || !identical(tr$fill, "toself")) return(list(tr))
+    keys  <- unlist(tr$key)
+    piece <- cumsum(is.na(tr$x))          # rectangles are separated by NA
+    keep  <- !is.na(tr$x)
+    lapply(seq_along(unique(piece[keep])), function(i) {
+      rows <- keep & piece == unique(piece[keep])[i]
+      out  <- tr
+      out$x <- tr$x[rows]; out$y <- tr$y[rows]
+      out$key  <- keys[rows][1]
+      out$text <- unname(hover[out$key])
+      out$legendgroup <- tr$name
+      out$showlegend  <- isTRUE(tr$showlegend) && i == 1
+      out
+    })
+  }), recursive = FALSE)
+  plt
+}

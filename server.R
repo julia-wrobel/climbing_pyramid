@@ -83,7 +83,8 @@ function(input, output, session) {
       mutate(
         total  = sum(n),
         xend   = cumsum(n) - total / 2,
-        xstart = xend - n
+        xstart = xend - n,
+        key    = paste(route_type, rating_new, lead_style, sep = "|")
       ) %>%
       ungroup()
 
@@ -101,8 +102,9 @@ function(input, output, session) {
            aes(xmin = xstart, xmax = xend,
                ymin = as.numeric(rating_new) - 0.4,
                ymax = as.numeric(rating_new) + 0.4,
-               fill = lead_style,
-               text = paste0("Lead Style: ", lead_style, "<br>Count: ", n))) +
+               fill = lead_style, key = key,
+               text = paste0("Lead Style: ", lead_style, "<br>Count: ", n,
+                             "<br><i>Click to see routes</i>"))) +
       geom_rect() +
       geom_blank(data = yds_blank, aes(y = y), inherit.aes = FALSE) +
       scale_fill_manual(values = lead_style_colors, name = NULL) +
@@ -114,7 +116,50 @@ function(input, output, session) {
 axis.text.x     = element_blank(),
             axis.ticks.x    = element_blank())
 
-    ggplotly(p, tooltip = "text")
+    # Send the clicked chunk's key to Shiny as an event, so clicking the same
+    # chunk twice still reopens the route list.
+    split_rect_traces(ggplotly(p, tooltip = "text"), ticks_summary) %>%
+      htmlwidgets::onRender("
+        function(el) {
+          el.on('plotly_click', function(d) {
+            var key = [].concat(d.points[0].data.key).find(Boolean);
+            if (key) Shiny.setInputValue('pyramid_click', key, {priority: 'event'});
+          });
+        }")
+  })
+
+  # Clicking a chunk of the pyramid opens a list of the routes in it.
+  observeEvent(input$pyramid_click, {
+    key <- input$pyramid_click
+    parts <- strsplit(key, "|", fixed = TRUE)[[1]]
+
+    routes <- filtered_ticks() %>%
+      filter(route_type == parts[1], rating_new == parts[2], lead_style == parts[3]) %>%
+      arrange(desc(date))
+
+    rows <- pmap(list(routes$route, routes$url, routes$rating, routes$date,
+                      routes$location, routes$pitches),
+      function(route, url, rating, date, location, pitches) {
+        tags$tr(
+          tags$td(tags$a(route, href = url, target = "_blank")),
+          tags$td(rating),
+          tags$td(format(date, "%b %d, %Y"), style = "white-space: nowrap"),
+          tags$td(pitches),
+          tags$td(str_replace_all(location, " > ", " › "))
+        )
+      })
+
+    showModal(modalDialog(
+      title     = paste0(parts[2], " ", parts[1], " · ", parts[3],
+                         " (", nrow(routes), if (nrow(routes) == 1) " tick)" else " ticks)"),
+      size      = "l",
+      easyClose = TRUE,
+      footer    = modalButton("Close"),
+      tags$table(class = "table table-condensed table-striped",
+        tags$thead(tags$tr(tags$th("Route"), tags$th("Grade"), tags$th("Date"),
+                           tags$th("Pitches"), tags$th("Location"))),
+        tags$tbody(rows))
+    ))
   })
 
   output$pitch_count <- renderText({

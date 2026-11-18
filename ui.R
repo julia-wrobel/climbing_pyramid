@@ -36,7 +36,7 @@ fluidPage(
             inputId  = "route_type",
             label    = "Route Type",
             choices  = c("Sport", "Trad", "Toprope", "Aid", "Ice", "Boulder"),
-            selected = c("Sport", "Trad", "Toprope", "Aid", "Ice", "Boulder")
+            selected = c("Sport", "Trad")
           ),
 
           uiOutput("year_filter"),
@@ -75,7 +75,7 @@ fluidPage(
             inputId  = "map_route_type",
             label    = "Route Type",
             choices  = c("Sport", "Trad", "Toprope", "Aid", "Ice", "Boulder"),
-            selected = c("Sport", "Trad", "Toprope", "Aid", "Ice", "Boulder")
+            selected = c("Sport", "Trad")
           ),
           helpText("States are shaded by number of ticks. Climbs outside the US are not shown.")
         ),
